@@ -1,0 +1,7 @@
+* text=auto
+*.java text eol=lf
+*.md text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.csv text eol=lf
+META-INF/MANIFEST.MF whitespace=-blank-at-eof

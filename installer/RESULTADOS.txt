@@ -1,0 +1,36 @@
+﻿VALIDACAO DO INSTALADOR — 14/10/2026
+
+14 verificacoes automatizadas aprovadas em Windows PowerShell:
+- Apenas dois ficheiros de configuracao originais modificados.
+- Executavel e restantes ficheiros oficiais conservados.
+- Reinstalacao sem duplicar registos.
+- Estado da instalacao consultavel.
+- Fragmento carregado no OSGi da configuracao original; selftest do add-on aprovado.
+- Desinstalacao restaura configuracoes byte a byte e remove o JAR verificado.
+- Backups mantidos.
+- Versao 0.89.1 simulada recusada sem escrever na configuracao.
+- Desinstalacao preserva metadados de versao e definicoes acrescentadas por update simulado.
+- Registo removido por regeneracao simulada de bundles.info detetado.
+- Apenas os tres elementos do add-on retirados do estado da interface;
+  todos os restantes bytes desse ficheiro preservados.
+
+TESTES VISUAIS
+Executavel oficial 0.89.0 aberto sem configuracao externa, sem lancador do
+add-on e sem -clean: a opcao Trading 212 apareceu em Ficheiro > Importar.
+A renovacao da cache foi acrescentada apos se detetar que uma desinstalacao
+sem esse passo ainda mostrava a entrada antiga do menu.
+A limpeza dirigida do estado da interface foi igualmente necessaria.
+Confirmado visualmente: apos desinstalar e abrir novamente o executavel
+oficial, a opcao Trading 212 desapareceu do menu Ficheiro > Importar.
+Evidencias visuais incluidas no pacote.
+
+ATUALIZACOES: LIMITE DA VERIFICACAO
+Inspecionado o UpdateHelper upstream: o PP usa Eclipse p2/UpdateOperation.
+Testados cenarios LOCAIS SIMULADOS de reescrita de configuracao e mudanca
+de versao. Nao foi aplicada uma atualizacao real para uma versao posterior;
+nao se afirma compatibilidade nem preservacao automatica atraves de updates.
+
+O JAR do importador e o mesmo da versao 0.1.0 anteriormente testada:
+1065 movimentos reconciliados e teste misto de 1065 existentes + 6 novos
+aprovado. O instalador nao modifica as classes do importador ou do PP.
+Nenhum CSV pessoal, XML de carteira ou credencial incluido neste pacote.

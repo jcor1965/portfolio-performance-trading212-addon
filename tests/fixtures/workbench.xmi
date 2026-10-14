@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <children elementId="keep.this.menu" label="Synthetic user setting"/>
+  <children elementId="org.trading212.ppaddon.import" label="Trading 212"/>
+  <handlers elementId="org.trading212.ppaddon.import.handler"/>
+  <commands elementId="org.trading212.ppaddon.import"/>
+  <settings value="preserve-this-exactly"/>
+</application>

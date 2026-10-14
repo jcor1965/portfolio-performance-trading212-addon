@@ -1,0 +1,67 @@
+﻿INSTALADOR DO ADD-ON TRADING 212 0.1.0
+Para Portfolio Performance OFICIAL 0.89.0, Windows 64 bits.
+Instalador local em CMD/PowerShell; nao e um instalador EXE assinado.
+
+INSTALAR
+1. Extraia TODO o ZIP para uma pasta sua. Nao execute dentro do ZIP.
+2. Feche o Portfolio Performance.
+3. Abra Instalar.cmd e escolha o PortfolioPerformance.exe da instalacao
+   oficial 0.89.0 que normalmente utiliza.
+4. Depois da mensagem de sucesso, abra o PP pelo atalho HABITUAL.
+5. Abra uma carteira. Use Ficheiro > Importar > Trading 212 (CSV - add-on).
+   O menu fica desativado enquanto nenhuma carteira estiver aberta.
+6. Para os primeiros testes, abra uma COPIA da carteira e confirme as contas
+   de caixa e de titulos no assistente antes de terminar a importacao.
+
+Nao e necessario usar Abrir-Addon.cmd nem o lancador separado da prova anterior.
+Este pacote instala o MESMO importador 0.1.0; nao acrescenta suporte a cambio
+nem a encargos adicionais ainda rejeitados. Mantem as verificacoes de duplicados
+do assistente oficial, que sao avisos e podem ser aceites manualmente.
+
+O QUE E ALTERADO
+Apenas dois ficheiros originais de configuracao sao ajustados:
+configuration/config.ini e
+configuration/org.eclipse.equinox.simpleconfigurator/bundles.info.
+O JAR e acrescentado em addons/trading212, com registo e backups nessa pasta.
+Executavel, INI de arranque, bibliotecas oficiais e carteiras nao sao alterados.
+As caches derivadas configuration/org.eclipse.osgi e org.eclipse.core.runtime
+sao movidas para o backup; o PP regenera-as no proximo arranque. Isto evita
+que o complemento continue em memoria de cache depois de desinstalar.
+O primeiro arranque pode demorar mais. O workspace nao e apagado.
+Na desinstalacao, apenas as tres entradas do add-on no estado da interface
+sao retiradas, com backup do workbench.xmi; o restante ficheiro e preservado.
+O workspace habitual e identificado pela configuracao do PP/INI.
+Se utiliza um workspace personalizado por argumento -data num atalho,
+indique-o na desinstalacao tecnica:
+Manage-Addon.ps1 -Mode Uninstall -PortfolioPath "pasta do PP" -WorkspacePath "workspace"
+
+DESINSTALAR
+Feche o PP. Abra Desinstalar.cmd e escolha o mesmo executavel.
+O instalador restaura os dois ficheiros de configuracao byte a byte quando
+nao houve alteracoes posteriores. Caso tenham mudado, retira apenas as suas
+entradas, preservando as alteracoes posteriores. Retira o JAR se o hash
+corresponder ao instalado; um JAR alterado e preservado e desligado.
+Os backups sao mantidos em addons/trading212/backups. Nunca apaga carteiras.
+
+ATUALIZACOES DO PORTFOLIO PERFORMANCE
+Recomendacao: desinstale o add-on ANTES de atualizar o PP.
+Este complemento nao participa no mecanismo p2 de atualizacoes do PP.
+Uma atualizacao pode regenerar bundles.info e retirar o registo, fazendo
+desaparecer o menu. O instalador nao garante que o add-on sobreviva a updates.
+Uma nova versao exige nova validacao: este pacote recusa instalar em 0.89.1
+ou qualquer outra versao. Nao force a compatibilidade no manifesto.
+Se ja atualizou, feche o PP e use Verificar.cmd. Desinstalar.cmd foi preparado
+para limpar o registo antigo sem restaurar por cima a configuracao da nova
+versao. Depois aguarde um pacote validado para essa versao.
+Nao repare isto copiando ficheiros de configuracao antigos por cima dos novos.
+
+PERMISSOES E ERROS
+Precisa de permissao de escrita na pasta escolhida. O instalador nao se
+eleva automaticamente nem altera politicas de seguranca do Windows.
+Se a pasta estiver em Program Files, a operacao pode exigir permissoes de
+administrador. Se o Windows bloquear o script, comunique a mensagem;
+nao desative globalmente as politicas de seguranca para o executar.
+Conserve este pacote para Verificar.cmd e Desinstalar.cmd.
+
+Validacao e limitacoes de testes: RESULTADOS.txt.
+Nenhuma instalacao pessoal foi alterada para preparar este pacote.

@@ -1,0 +1,32 @@
+name: Synthetic validation
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Fetch verified official test host
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force .build | Out-Null
+          Invoke-WebRequest 'https://github.com/portfolio-performance/portfolio/releases/download/0.89.0/PortfolioPerformance-0.89.0-win32.win32.x86_64.zip' -OutFile .build/official.zip
+          $expected = 'd7ec068c07be545d4ba37edd37e482444370ef2684463a734c78897c1091f7b8'
+          if ((Get-FileHash .build/official.zip).Hash.ToLowerInvariant() -ne $expected) { throw 'Host archive checksum mismatch' }
+          Expand-Archive .build/official.zip .build/official
+      - name: Build
+        shell: pwsh
+        run: ./scripts/Build.ps1 -PortfolioPath .build/official/portfolio -JavaHome $env:JAVA_HOME
+      - name: Synthetic importer regression
+        shell: pwsh
+        run: ./scripts/Test.ps1 -PortfolioPath .build/official/portfolio -JavaHome $env:JAVA_HOME
+      - name: Installer and simulated-update regression
+        shell: pwsh
+        run: python tests/test_installer.py --portfolio .build/official/portfolio --java-home "$env:JAVA_HOME"

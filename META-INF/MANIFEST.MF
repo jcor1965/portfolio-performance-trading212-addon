@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Trading 212 CSV Add-on (proof of concept)
+Bundle-SymbolicName: org.trading212.ppaddon;singleton:=true
+Bundle-Version: 0.1.0
+Fragment-Host: name.abuchen.portfolio.ui;bundle-version="[0.89.0,0.89.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Require-Bundle: name.abuchen.portfolio;bundle-version="[0.89.0,0.89.1)",
+ org.apache.commons.commons-csv;bundle-version="[1.14.0,2.0.0)",
+ org.eclipse.equinox.app
+

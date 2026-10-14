@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<fragment>
+  <extension point="org.eclipse.e4.workbench.model">
+    <processor class="org.trading212.ppaddon.MenuProcessor" beforefragment="false" apply="always"/>
+  </extension>
+  <extension point="org.eclipse.core.runtime.applications" id="selftest">
+    <application visible="false">
+      <run class="org.trading212.ppaddon.SelfTestApplication"/>
+    </application>
+  </extension>
+</fragment>

@@ -1,0 +1,10 @@
+Trading 212 CSV add-on for Portfolio Performance
+Maintainer: jcor1965
+
+The import handler is adapted from Portfolio Performance's
+name.abuchen.portfolio.ui.handlers.ImportXTBHandler. The integration uses
+Portfolio Performance's existing import review, duplicate checks and model.
+Upstream: https://github.com/portfolio-performance/portfolio
+Inspected upstream revision: f84ff1a432ec9ba61c17aa2ae4191c8b068643a7
+The upstream Eclipse Public License 1.0 text is retained in LICENSE.txt.
+Names and product marks identify compatibility, not endorsement.

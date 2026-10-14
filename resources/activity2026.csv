@@ -1,0 +1,8 @@
+Action,Time (UTC),ISIN,Ticker,Name,Notes,ID,No. of shares,Price / share,Currency (Price / share),Exchange rate,Result,Currency (Result),Total,Currency (Total),Withholding tax,Currency (Withholding tax)
+Deposit,2026-09-01 10:00:00+00:00,,,,Bank Transfer,DEP1,,,,,,,200.00,EUR,,
+Limit buy,2026-09-01 11:00:00+00:00,IE0000000004,ABC,Example ETF,,EX1,1.1234567800,5.01,EUR,1.00000000,,,5.63,EUR,,
+Limit sell,2026-09-01 12:00:00+00:00,IE0000000004,ABC,Example ETF,,EX2,0.2000000000,8.50,EUR,1.00000000,-0.20,EUR,1.70,EUR,,
+Withdrawal,2026-09-01 13:00:00+00:00,,,,Bank Transfer,WD1,,,,,,,-40.00,EUR,,
+Interest on cash,2026-09-01 14:00:00+00:00,,,,Interest on cash,IN1,,,,,,,0.05,EUR,,
+Dividend (Dividend),2026-09-01 15:00:00+00:00,IE0000000004,ABC,Example ETF,,,14.0000000000,0.10,EUR,1.00000000,,,1.20,EUR,0.20,EUR
+Dividend (Interest),2026-09-01 16:00:00+00:00,XS0000000009,XYZ,Example Income ETP,,,8.0000000000,0.10,EUR,1.00000000,,,0.80,EUR,0.00,EUR
