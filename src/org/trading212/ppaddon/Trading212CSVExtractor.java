@@ -37,7 +37,9 @@ import name.abuchen.portfolio.util.Isin;
 
 /**
  * Imports the CSV activity history exported from Trading 212 Invest.
- * Supports the 2025 (15 columns) and 2026 (17 columns) export layouts.
+ * Column availability depends on the transaction types included in the export,
+ * not on the calendar year. Fields are matched by header name; optional columns
+ * may be omitted when no relevant transactions are present.
  * All values are taken from the broker's booked Total field; Result is a
  * realised P/L disclosure, not a separate cash transaction.
  */
