@@ -7,20 +7,21 @@ param(
 $ErrorActionPreference = 'Stop'
 $official = (Resolve-Path -LiteralPath $PortfolioPath).Path.TrimEnd('\')
 $hostJar = Join-Path $official 'plugins/name.abuchen.portfolio.ui_0.89.0.jar'
-if (-not (Test-Path -LiteralPath $hostJar)) { throw 'Este POC exige a distribuicao oficial 0.89.0. Nenhum ficheiro foi alterado.' }
-if ($official.Contains(',')) { throw 'Para este POC, escolha uma pasta sem virgulas no caminho.' }
+if (-not (Test-Path -LiteralPath $hostJar)) { throw 'This proof of concept requires the official 0.89.0 distribution. No files were changed.' }
+if ($official.Contains(',')) { throw 'For this proof of concept, select a folder without commas in its path.' }
 $addon = Join-Path $PSScriptRoot 'org.trading212.ppaddon_0.1.0.jar'
-if (-not (Test-Path -LiteralPath $addon)) { throw 'JAR do complemento em falta.' }
+if (-not (Test-Path -LiteralPath $addon)) { throw 'The add-on JAR is missing.' }
 $stateRoot = Join-Path $PSScriptRoot 'state'
 $configRoot = Join-Path $stateRoot 'configuration'
 $simpleRoot = Join-Path $configRoot 'org.eclipse.equinox.simpleconfigurator'
 New-Item -ItemType Directory -Force -Path $simpleRoot,(Join-Path $stateRoot 'home') | Out-Null
 function FileUri([string]$path) { return ([Uri]([IO.Path]::GetFullPath($path))).AbsoluteUri.Replace(',', '%2C') }
 $bundleLines = Get-Content -LiteralPath (Join-Path $official 'configuration/org.eclipse.equinox.simpleconfigurator/bundles.info')
+# Resolve host libraries into a separate configuration without editing originals.
 $resolvedLines = foreach ($line in $bundleLines) {
     if ($line.StartsWith('#') -or [string]::IsNullOrWhiteSpace($line)) { $line; continue }
     $fields = $line.Split(',')
-    if ($fields.Length -ne 5 -or -not $fields[2].StartsWith('plugins/')) { throw 'Formato bundles.info nao suportado; original preservado.' }
+    if ($fields.Length -ne 5 -or -not $fields[2].StartsWith('plugins/')) { throw 'Unsupported bundles.info format; the original file was preserved.' }
     $fields[2] = FileUri (Join-Path $official $fields[2])
     $fields -join ','
 }
@@ -54,7 +55,8 @@ $ini = @(Get-Content -LiteralPath (Join-Path $official 'PortfolioPerformance.ini
 $vmIndex = [Array]::IndexOf($ini, '-vmargs')
 $vmArgs = if ($vmIndex -ge 0) { @($ini | Select-Object -Skip ($vmIndex + 1) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) } else { @() }
 if ($SelfTest) {
-    if (-not $JavaPath) { throw 'Para SelfTest, indique JavaPath para java.exe (Java 21).' }
+    if (-not $JavaPath) { throw 'For SelfTest, specify JavaPath pointing to java.exe (Java 21).' }
+    # Run the explicit OSGi test application without opening the normal UI.
     $launcher = Get-ChildItem -LiteralPath (Join-Path $official 'plugins') -Filter 'org.eclipse.equinox.launcher_*.jar' | Select-Object -First 1
     $javaArguments = $vmArgs + @('-Dname.abuchen.portfolio.in-app-update=disable', ('-Duser.home=' + (Join-Path $stateRoot 'home')), ('-Dt212.addon.evidence=' + (Join-Path $stateRoot 'evidence')), '-jar', $launcher.FullName, '-install', $official, '-configuration', $configRoot, '-data', (Join-Path $stateRoot 'workspace'), '-clean', '-nosplash', '-application', 'name.abuchen.portfolio.ui.selftest', '-consoleLog')
     & $JavaPath @javaArguments
@@ -62,7 +64,7 @@ if ($SelfTest) {
 }
 $arguments += @('-vmargs') + $vmArgs + @('-Dname.abuchen.portfolio.in-app-update=disable', ('-Duser.home=' + (Join-Path $stateRoot 'home')), ('-Dt212.addon.evidence=' + (Join-Path $stateRoot 'evidence')))
 function QuoteArgument([string]$value) {
-    if ($value.Contains('"')) { throw 'Aspas num argumento nao sao suportadas neste POC.' }
+    if ($value.Contains('"')) { throw 'Quotes in arguments are not supported by this proof of concept.' }
     return '"' + $value + '"'
 }
 $commandArguments = ($arguments | ForEach-Object { QuoteArgument $_ }) -join ' '

@@ -14,6 +14,8 @@ public final class MenuProcessor
     @Execute
     public void install(MApplication application)
     {
+        // Avoid duplicate contributions when the processor runs again or when
+        // Eclipse reloads a model that already contains this add-on's entries.
         for (var window : application.getChildren())
         {
             var target = find(window.getMainMenu());
@@ -39,7 +41,7 @@ public final class MenuProcessor
             var item = MMenuFactory.INSTANCE.createHandledMenuItem();
             item.setElementId(ID);
             item.setLabel("Trading 212 (CSV - add-on)");
-            item.setTooltip("Complemento separado de importacao Trading 212");
+            item.setTooltip("Independent Trading 212 import add-on");
             item.setCommand(command);
             target.getChildren().add(item);
         }

@@ -71,7 +71,7 @@ run('Install')
 # Simulate p2 dropping unmanaged registration, as it may regenerate bundles.info.
 installed=bundles.read_bytes();bundles.write_bytes(originalBundles)
 status=run('Status').stdout
-check(b'Registado: False' in status,'status detects registration removed by updater')
+check(b'Registered: False' in status,'status detects registration removed by updater')
 bundles.write_bytes(installed)
 (test/'checks.json').write_text(json.dumps(checks,indent=2))
 print('INSTALLER CHECKS PASS:',len(checks),str(test),flush=True)

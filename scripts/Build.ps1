@@ -11,6 +11,7 @@ if($LASTEXITCODE -ne 0 -or "$version" -notmatch '^javac 21\.') { throw 'JDK 21 r
 $build=Join-Path $root ('.build/compile-'+[Guid]::NewGuid().ToString('N'))
 $classes=Join-Path $build 'classes';$dist=Join-Path $root 'dist';$installer=Join-Path $dist 'installer'
 New-Item -ItemType Directory -Force -Path $classes,$installer|Out-Null
+# Compile against the official host libraries; do not redistribute or patch them.
 $classpath=((Get-ChildItem -LiteralPath (Join-Path $official 'plugins') -Filter '*.jar'|Where-Object {$_.Name -notmatch '\.nl_'}).FullName)-join ';'
 $arguments=@('--release','21','-encoding','UTF-8','-classpath',$classpath,'-d',$classes)
 $arguments+=@(Get-ChildItem -LiteralPath (Join-Path $root 'src') -Recurse -Filter '*.java'|ForEach-Object {$_.FullName})
@@ -26,6 +27,7 @@ Copy-Item -Path (Join-Path $root 'installer/*') -Destination $installer -Force
 Copy-Item -Path (Join-Path $root 'docs/images/*.png') -Destination $installer -Force
 $hash=(Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash
 [IO.File]::WriteAllText((Join-Path $installer 'addon.sha256'),$hash,[Text.Encoding]::ASCII)
+# Generate the three English entry points from a single shared installer.
 foreach($pair in @(@('Install','Install'),@('Uninstall','Uninstall'),@('Check','Status'))) {
     $cmd='@echo off' + "`r`n" + 'powershell.exe -NoProfile -STA -File "%~dp0Manage-Addon.ps1" -Mode '+$pair[1]+"`r`n"+'if errorlevel 1 pause'+"`r`n"
     [IO.File]::WriteAllText((Join-Path $installer ($pair[0]+'.cmd')),$cmd,[Text.Encoding]::ASCII)

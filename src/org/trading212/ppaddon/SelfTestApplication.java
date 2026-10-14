@@ -57,13 +57,13 @@ public final class SelfTestApplication implements IApplication
                 Files.copy(resource, fixture, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
             var client = new Client();
-            var account = new Account("Trading 212 - TESTE");
+            var account = new Account("Trading 212 - TEST");
             account.setCurrencyCode("EUR");
             client.addAccount(account);
-            var portfolio = new Portfolio("Trading 212 - TESTE");
+            var portfolio = new Portfolio("Trading 212 - TEST");
             portfolio.setReferenceAccount(account);
             client.addPortfolio(portfolio);
-            ClientFactory.save(client, evidence.resolve("carteira-vazia.xml").toFile());
+            ClientFactory.save(client, evidence.resolve("wallet-empty.xml").toFile());
             var errors = new ArrayList<Exception>();
             var extractor = new Trading212CSVExtractor(client);
             var cache = new SecurityCache(client);
@@ -81,8 +81,8 @@ public final class SelfTestApplication implements IApplication
                     insert.process(transaction, account);
             }
             check(account.getTransactions().size() == 7 && portfolio.getTransactions().size() == 2, "insertion through official InsertAction");
-            ClientFactory.save(client, evidence.resolve("carteira-importada.xml").toFile());
-            try (var input = Files.newInputStream(evidence.resolve("carteira-importada.xml")))
+            ClientFactory.save(client, evidence.resolve("wallet-imported.xml").toFile());
+            try (var input = Files.newInputStream(evidence.resolve("wallet-imported.xml")))
             {
                 var loaded = ClientFactory.load(input);
                 check(loaded.getAccounts().getFirst().getTransactions().size() == 7, "official wallet save/reload");

@@ -7,6 +7,7 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Start-Isolated.ps1') -Destinati
 Copy-Item -LiteralPath (Join-Path $root 'dist/installer/org.trading212.ppaddon_0.1.0.jar') -Destination $overlay
 $privateDirectory=$env:PP_TRADING212_PRIVATE_DIR
 try {
+    # Public regression tests must not pick up private input from the environment.
     $env:PP_TRADING212_PRIVATE_DIR=$null
     & (Join-Path $overlay 'Start-Addon.ps1') -PortfolioPath $PortfolioPath -JavaPath (Join-Path $JavaHome 'bin/java.exe') -SelfTest
     if($LASTEXITCODE -ne 0){throw 'Synthetic OSGi self-test failed.'}

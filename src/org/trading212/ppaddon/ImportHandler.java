@@ -82,6 +82,8 @@ public class ImportHandler
             for (var name : dialog.getFileNames())
                 files.add(new Extractor.InputFile(new File(dialog.getFilterPath(), name)));
 
+            // Reuse securities across every selected file before opening the
+            // official review wizard, which also checks existing transactions.
             var cache = new SecurityCache(client);
             Map<File, List<Exception>> exceptions = new HashMap<>();
             var items = new ArrayList<Extractor.Item>();
@@ -97,6 +99,8 @@ public class ImportHandler
             results.put(extractor, items);
             cache.addMissingSecurityItems(results);
 
+            // Keep account selection, duplicate warnings and insertion in the
+            // host wizard rather than writing directly into the user's wallet.
             var wizard = new ImportExtractedItemsWizard(client, portfolioPart.getPreferenceStore(), results,
                             exceptions, new HashMap<>(), portfolioPart);
             portfolioPart.inject(wizard);
