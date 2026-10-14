@@ -26,7 +26,7 @@ Copy-Item -Path (Join-Path $root 'installer/*') -Destination $installer -Force
 Copy-Item -Path (Join-Path $root 'docs/images/*.png') -Destination $installer -Force
 $hash=(Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash
 [IO.File]::WriteAllText((Join-Path $installer 'addon.sha256'),$hash,[Text.Encoding]::ASCII)
-foreach($pair in @(@('Instalar','Install'),@('Desinstalar','Uninstall'),@('Verificar','Status'))) {
+foreach($pair in @(@('Install','Install'),@('Uninstall','Uninstall'),@('Check','Status'))) {
     $cmd='@echo off' + "`r`n" + 'powershell.exe -NoProfile -STA -File "%~dp0Manage-Addon.ps1" -Mode '+$pair[1]+"`r`n"+'if errorlevel 1 pause'+"`r`n"
     [IO.File]::WriteAllText((Join-Path $installer ($pair[0]+'.cmd')),$cmd,[Text.Encoding]::ASCII)
 }

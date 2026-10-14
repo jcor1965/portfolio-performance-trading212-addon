@@ -1,11 +1,11 @@
-﻿INSTALADOR DO ADD-ON TRADING 212 0.1.0
+INSTALADOR DO ADD-ON TRADING 212 0.1.0
 Para Portfolio Performance OFICIAL 0.89.0, Windows 64 bits.
 Instalador local em CMD/PowerShell; nao e um instalador EXE assinado.
 
 INSTALAR
 1. Extraia TODO o ZIP para uma pasta sua. Nao execute dentro do ZIP.
 2. Feche o Portfolio Performance.
-3. Abra Instalar.cmd e escolha o PortfolioPerformance.exe da instalacao
+3. Abra Install.cmd e escolha o PortfolioPerformance.exe da instalacao
    oficial 0.89.0 que normalmente utiliza.
 4. Depois da mensagem de sucesso, abra o PP pelo atalho HABITUAL.
 5. Abra uma carteira. Use Ficheiro > Importar > Trading 212 (CSV - add-on).
@@ -36,7 +36,7 @@ indique-o na desinstalacao tecnica:
 Manage-Addon.ps1 -Mode Uninstall -PortfolioPath "pasta do PP" -WorkspacePath "workspace"
 
 DESINSTALAR
-Feche o PP. Abra Desinstalar.cmd e escolha o mesmo executavel.
+Feche o PP. Abra Uninstall.cmd e escolha o mesmo executavel.
 O instalador restaura os dois ficheiros de configuracao byte a byte quando
 nao houve alteracoes posteriores. Caso tenham mudado, retira apenas as suas
 entradas, preservando as alteracoes posteriores. Retira o JAR se o hash
@@ -50,7 +50,7 @@ Uma atualizacao pode regenerar bundles.info e retirar o registo, fazendo
 desaparecer o menu. O instalador nao garante que o add-on sobreviva a updates.
 Uma nova versao exige nova validacao: este pacote recusa instalar em 0.89.1
 ou qualquer outra versao. Nao force a compatibilidade no manifesto.
-Se ja atualizou, feche o PP e use Verificar.cmd. Desinstalar.cmd foi preparado
+Se ja atualizou, feche o PP e use Check.cmd. Uninstall.cmd foi preparado
 para limpar o registo antigo sem restaurar por cima a configuracao da nova
 versao. Depois aguarde um pacote validado para essa versao.
 Nao repare isto copiando ficheiros de configuracao antigos por cima dos novos.
@@ -61,7 +61,7 @@ eleva automaticamente nem altera politicas de seguranca do Windows.
 Se a pasta estiver em Program Files, a operacao pode exigir permissoes de
 administrador. Se o Windows bloquear o script, comunique a mensagem;
 nao desative globalmente as politicas de seguranca para o executar.
-Conserve este pacote para Verificar.cmd e Desinstalar.cmd.
+Conserve este pacote para Check.cmd e Uninstall.cmd.
 
 Validacao e limitacoes de testes: RESULTADOS.txt.
 Nenhuma instalacao pessoal foi alterada para preparar este pacote.

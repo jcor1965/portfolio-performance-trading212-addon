@@ -6,9 +6,9 @@ An independent, experimental add-on that adds **File → Import → Trading 212 
 
 ## Install and remove
 
-Extract the installer release ZIP, close Portfolio Performance and run `Instalar.cmd`. Select the official `PortfolioPerformance.exe`. Open the program using your usual shortcut and open a wallet to enable the menu.
+Extract the installer release ZIP, close Portfolio Performance and run `Install.cmd`. Select the official `PortfolioPerformance.exe`. Open the program using your usual shortcut and open a wallet to enable the menu.
 
-To remove the add-on, close the program and run `Desinstalar.cmd`. `Verificar.cmd` reports registration and compatibility. See [Portuguese installation instructions](installer/LEIA-ME.txt).
+To remove the add-on, close the program and run `Uninstall.cmd`. `Check.cmd` reports registration and compatibility. See [Portuguese installation instructions](installer/LEIA-ME.txt).
 
 The installer adds its JAR under `addons/trading212` and changes only `configuration/config.ini` and `configuration/org.eclipse.equinox.simpleconfigurator/bundles.info` among the shipped application files. Executables and official libraries are not patched. It backs up configuration, archives derived Eclipse caches and removes only the add-on's three persisted UI nodes on uninstall, preserving the other workspace bytes. Wallets are not modified by installation or removal; importing and saving a wallet does modify that wallet.
 
