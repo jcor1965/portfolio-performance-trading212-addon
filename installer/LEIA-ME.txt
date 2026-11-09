@@ -1,12 +1,13 @@
-INSTALADOR DO ADD-ON TRADING 212 0.1.0
-Para Portfolio Performance OFICIAL 0.89.0, Windows 64 bits.
+INSTALADOR DO ADD-ON TRADING 212 0.1.1
+Para Portfolio Performance OFICIAL 0.89.0 ou 0.90.0, Windows 64 bits.
 Instalador local em CMD/PowerShell; nao e um instalador EXE assinado.
 
 INSTALAR
 1. Extraia TODO o ZIP para uma pasta sua. Nao execute dentro do ZIP.
-2. Feche o Portfolio Performance.
+2. Feche o Portfolio Performance. Se o add-on v0.1.0 ja estiver instalado,
+   execute primeiro o Uninstall.cmd deste pacote e escolha o mesmo executavel.
 3. Abra Install.cmd e escolha o PortfolioPerformance.exe da instalacao
-   oficial 0.89.0 que normalmente utiliza.
+   oficial 0.89.0 ou 0.90.0 que normalmente utiliza.
 4. Depois da mensagem de sucesso, abra o PP pelo atalho HABITUAL.
 5. Abra uma carteira. Use Ficheiro > Importar > Trading 212 (CSV - add-on).
    O menu fica desativado enquanto nenhuma carteira estiver aberta.
@@ -14,8 +15,8 @@ INSTALAR
    de caixa e de titulos no assistente antes de terminar a importacao.
 
 Nao e necessario usar Abrir-Addon.cmd nem o lancador separado da prova anterior.
-Este pacote instala o MESMO importador 0.1.0; nao acrescenta suporte a cambio
-nem a encargos adicionais ainda rejeitados. Mantem as verificacoes de duplicados
+O importador continua a rejeitar conversoes cambiais e encargos adicionais
+nao suportados. Mantem as verificacoes de duplicados
 do assistente oficial, que sao avisos e podem ser aceites manualmente.
 
 O QUE E ALTERADO
@@ -48,12 +49,11 @@ Recomendacao: desinstale o add-on ANTES de atualizar o PP.
 Este complemento nao participa no mecanismo p2 de atualizacoes do PP.
 Uma atualizacao pode regenerar bundles.info e retirar o registo, fazendo
 desaparecer o menu. O instalador nao garante que o add-on sobreviva a updates.
-Uma nova versao exige nova validacao: este pacote recusa instalar em 0.89.1
-ou qualquer outra versao. Nao force a compatibilidade no manifesto.
+O instalador aceita apenas 0.89.0 e 0.90.0.
 Se ja atualizou, feche o PP e use Check.cmd. Uninstall.cmd foi preparado
 para limpar o registo antigo sem restaurar por cima a configuracao da nova
-versao. Depois aguarde um pacote validado para essa versao.
-Nao repare isto copiando ficheiros de configuracao antigos por cima dos novos.
+versao. Se a nova versao for suportada, volte a executar Install.cmd.
+Conserve a configuracao da nova versao.
 
 PERMISSOES E ERROS
 Precisa de permissao de escrita na pasta escolhida. O instalador nao se

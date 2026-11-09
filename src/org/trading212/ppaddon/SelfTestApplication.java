@@ -16,6 +16,8 @@ import org.osgi.framework.FrameworkUtil;
 import name.abuchen.portfolio.datatransfer.Extractor;
 import name.abuchen.portfolio.datatransfer.Extractor.InputFile;
 import name.abuchen.portfolio.datatransfer.SecurityCache;
+import name.abuchen.portfolio.datatransfer.ImportAction;
+import name.abuchen.portfolio.datatransfer.actions.DetectDuplicatesAction;
 import name.abuchen.portfolio.datatransfer.actions.InsertAction;
 import name.abuchen.portfolio.model.Account;
 import name.abuchen.portfolio.model.AccountTransaction;
@@ -24,6 +26,8 @@ import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.ClientFactory;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.PortfolioTransaction;
+import name.abuchen.portfolio.model.Transaction.Unit;
+import name.abuchen.portfolio.money.Money;
 
 /** Runs only on explicit command-line application selection; never on normal GUI startup. */
 public final class SelfTestApplication implements IApplication
@@ -36,7 +40,9 @@ public final class SelfTestApplication implements IApplication
         try
         {
             check("name.abuchen.portfolio.ui".equals(FrameworkUtil.getBundle(getClass()).getSymbolicName()), "fragment attached to official UI");
-            check(FrameworkUtil.getBundle(getClass()).getVersion().toString().equals("0.89.0"), "official 0.89.0 host");
+            var hostVersion = FrameworkUtil.getBundle(getClass()).getVersion().toString();
+            check(MenuProcessor.isSupportedHost() && !MenuProcessor.supportsHost("0.89.1")
+                            && !MenuProcessor.supportsHost("0.90.1"), "supported host " + hostVersion + " and exact version allowlist");
             var evidence = Path.of(System.getProperty("t212.addon.evidence"));
             Files.createDirectories(evidence);
             var app = MApplicationFactory.INSTANCE.createApplication();
@@ -87,6 +93,7 @@ public final class SelfTestApplication implements IApplication
                 var loaded = ClientFactory.load(input);
                 check(loaded.getAccounts().getFirst().getTransactions().size() == 7, "official wallet save/reload");
                 check(loaded.getAccounts().getFirst().getTransactions().stream().anyMatch(t -> t.getNote().contains("ABC|20260901T150000Z")), "key survives save/reload in standard Note");
+                checkDuplicates(fixture, loaded, "0.90.0".equals(hostVersion));
             }
             var text = Files.readString(fixture);
             var conflict = evidence.resolve("conflict.csv");
@@ -102,7 +109,7 @@ public final class SelfTestApplication implements IApplication
             var payments = new Trading212CSVExtractor(client).extract(new SecurityCache(client), new InputFile(noid.toFile()), errors);
             check(errors.isEmpty() && payments.size() == 2, "identical payments preserve within-file multiplicity");
             reconcilePrivate();
-            Files.writeString(evidence.resolve("selftest-result.txt"), "PASS: " + checks + " checks on original Portfolio Performance 0.89.0.\n");
+            Files.writeString(evidence.resolve("selftest-result.txt"), "PASS: " + checks + " checks on original Portfolio Performance " + hostVersion + ".\n");
             System.out.println("ADDON SELFTEST PASS: " + checks + " checks");
             return EXIT_OK;
         }
@@ -112,6 +119,72 @@ public final class SelfTestApplication implements IApplication
             return Integer.valueOf(1);
         }
     }
+
+    private void checkDuplicates(Path fixture, Client loaded, boolean updatedDetector) throws Exception
+    {
+        var account = loaded.getAccounts().getFirst();
+        var portfolio = loaded.getPortfolios().getFirst();
+        var errors = new ArrayList<Exception>();
+        var mixed = fixture.resolveSibling("mixed.csv");
+        var original = Files.readString(fixture);
+        Files.writeString(mixed, original.stripTrailing()
+                        + "\nDeposit,2026-09-02 10:00:00+00:00,,,,Bank Transfer,DEP2,,,,,,,23.45,EUR,,\n");
+        var items = new Trading212CSVExtractor(loaded).extract(new SecurityCache(loaded),
+                        new InputFile(mixed.toFile()), errors);
+        check(errors.isEmpty() && items.size() == 8, "mixed CSV: seven existing rows and one new row");
+        var detect = new DetectDuplicatesAction(loaded);
+        var insert = new InsertAction(loaded);
+        int duplicates = 0;
+        int added = 0;
+        for (var item : items)
+        {
+            var subject = item.getSubject();
+            var status = subject instanceof BuySellEntry entry ? detect.process(entry, account, portfolio)
+                            : detect.process((AccountTransaction) subject, account);
+            if (status.getCode() == ImportAction.Status.Code.WARNING)
+                duplicates++;
+            else if (status.getCode() == ImportAction.Status.Code.OK && subject instanceof AccountTransaction tx
+                            && tx.getAmount() == 2345 && tx.getType() == AccountTransaction.Type.DEPOSIT)
+            {
+                insert.process(tx, account);
+                added++;
+            }
+        }
+        check(duplicates == 7 && added == 1 && account.getTransactions().size() == 8
+                        && portfolio.getTransactions().size() == 2, "mixed reimport: seven flagged, only new deposit inserted");
+        var expectedManualStatus = updatedDetector ? ImportAction.Status.Code.WARNING : ImportAction.Status.Code.OK;
+        var dividend = account.getTransactions().stream()
+                        .filter(tx -> tx.getType() == AccountTransaction.Type.DIVIDENDS).findFirst().orElseThrow();
+        var manualDividend = new AccountTransaction();
+        manualDividend.setType(dividend.getType());
+        manualDividend.setDateTime(dividend.getDateTime().toLocalDate().atStartOfDay());
+        manualDividend.setCurrencyCode(dividend.getCurrencyCode());
+        manualDividend.setSecurity(dividend.getSecurity());
+        manualDividend.setAmount(dividend.getAmount());
+        var manualAccount = new Account();
+        manualAccount.addTransaction(manualDividend);
+        check(dividend.getShares() > 0 && detect.process(dividend, manualAccount).getCode() == expectedManualStatus,
+                        "host-specific detection of manual dividend without share count");
+        manualDividend.setAmount(dividend.getAmount() + 1);
+        check(detect.process(dividend, manualAccount).getCode() == ImportAction.Status.Code.OK,
+                        "dividend with a different cash amount stays eligible");
+
+        var manualInterest = new AccountTransaction();
+        manualInterest.setType(AccountTransaction.Type.INTEREST);
+        manualInterest.setDateTime(dividend.getDateTime().plusDays(1));
+        manualInterest.setCurrencyCode("EUR");
+        manualInterest.setAmount(100);
+        manualAccount.addTransaction(manualInterest);
+        var netInterest = new AccountTransaction();
+        netInterest.setType(AccountTransaction.Type.INTEREST);
+        netInterest.setDateTime(manualInterest.getDateTime());
+        netInterest.setCurrencyCode("EUR");
+        netInterest.setAmount(80);
+        netInterest.addUnit(new Unit(Unit.Type.TAX, Money.of("EUR", 20)));
+        check(detect.process(netInterest, manualAccount).getCode() == expectedManualStatus,
+                        "host-specific detection of manual interest recorded gross");
+    }
+
 
     private void reconcilePrivate() throws Exception
     {

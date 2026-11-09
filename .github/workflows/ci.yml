@@ -17,16 +17,31 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force .build | Out-Null
-          Invoke-WebRequest 'https://github.com/portfolio-performance/portfolio/releases/download/0.89.0/PortfolioPerformance-0.89.0-win32.win32.x86_64.zip' -OutFile .build/official.zip
-          $expected = 'd7ec068c07be545d4ba37edd37e482444370ef2684463a734c78897c1091f7b8'
-          if ((Get-FileHash .build/official.zip).Hash.ToLowerInvariant() -ne $expected) { throw 'Host archive checksum mismatch' }
-          Expand-Archive .build/official.zip .build/official
+          $checksums = @{
+            '0.89.0' = 'd7ec068c07be545d4ba37edd37e482444370ef2684463a734c78897c1091f7b8'
+            '0.90.0' = 'da0faae70e09fd6bab8e61c2f317b98c2f01a281a24dea041cb60473df1eb65c'
+          }
+          foreach ($version in $checksums.Keys) {
+            $asset = "PortfolioPerformance-$version-win32.win32.x86_64.zip"
+            $archive = ".build/$asset"
+            Invoke-WebRequest "https://github.com/portfolio-performance/portfolio/releases/download/$version/$asset" -OutFile $archive
+            if ((Get-FileHash $archive).Hash -ne $checksums[$version]) { throw "Host $version archive checksum mismatch" }
+            Expand-Archive $archive ".build/official-$version"
+          }
       - name: Build
         shell: pwsh
-        run: ./scripts/Build.ps1 -PortfolioPath .build/official/portfolio -JavaHome $env:JAVA_HOME
+        run: ./scripts/Build.ps1 -PortfolioPath .build/official-0.89.0/portfolio -JavaHome $env:JAVA_HOME
       - name: Synthetic importer regression
         shell: pwsh
-        run: ./scripts/Test.ps1 -PortfolioPath .build/official/portfolio -JavaHome $env:JAVA_HOME
+        run: |
+          foreach ($version in '0.89.0', '0.90.0') {
+            pwsh -NoProfile -File ./scripts/Test.ps1 -PortfolioPath ".build/official-$version/portfolio" -JavaHome $env:JAVA_HOME
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Installer and simulated-update regression
         shell: pwsh
-        run: python tests/test_installer.py --portfolio .build/official/portfolio --java-home "$env:JAVA_HOME"
+        run: |
+          foreach ($version in '0.89.0', '0.90.0') {
+            python tests/test_installer.py --portfolio ".build/official-$version/portfolio" --java-home "$env:JAVA_HOME"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

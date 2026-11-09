@@ -38,13 +38,16 @@ public class ImportHandler
     @CanExecute
     boolean isVisible(@Named(IServiceConstants.ACTIVE_PART) MPart part)
     {
-        return MenuHelper.isClientPartActive(part);
+        return MenuProcessor.isSupportedHost() && MenuHelper.isClientPartActive(part);
     }
 
     @Execute
     public void execute(@Named(IServiceConstants.ACTIVE_PART) MPart part,
                     @Named(IServiceConstants.ACTIVE_SHELL) Shell shell)
     {
+        if (!MenuProcessor.isSupportedHost())
+            return;
+
         MenuHelper.getActiveClient(part).ifPresent(client -> runImport(part, shell, client));
     }
 
@@ -104,6 +107,7 @@ public class ImportHandler
             var wizard = new ImportExtractedItemsWizard(client, portfolioPart.getPreferenceStore(), results,
                             exceptions, new HashMap<>(), portfolioPart);
             portfolioPart.inject(wizard);
+            wizard.setWindowTitle(extractor.getLabel());
             new ImportWizardDialog(Display.getDefault().getActiveShell(), wizard).open();
         }
         catch (IllegalArgumentException e)

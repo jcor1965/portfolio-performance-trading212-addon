@@ -20,7 +20,7 @@ $utf8=[Text.UTF8Encoding]::new($false)
 [IO.File]::WriteAllLines($argFile,@($arguments|ForEach-Object {if($_.Contains('"')){throw 'Quote in argument not supported.'}; '"'+$_.Replace('\','/')+'"'}),$utf8)
 & $javac ('@'+$argFile)
 if($LASTEXITCODE -ne 0){throw 'Compilation failed.'}
-$artifact=Join-Path $installer 'org.trading212.ppaddon_0.1.0.jar'
+$artifact=Join-Path $installer 'org.trading212.ppaddon_0.1.1.jar'
 & $jar --create --file $artifact --manifest (Join-Path $root 'META-INF/MANIFEST.MF') -C $classes . -C $root fragment.xml -C $root LICENSE.txt -C (Join-Path $root 'resources') activity2026.csv
 if($LASTEXITCODE -ne 0){throw 'JAR creation failed.'}
 Copy-Item -Path (Join-Path $root 'installer/*') -Destination $installer -Force
@@ -33,7 +33,7 @@ foreach($pair in @(@('Install','Install'),@('Uninstall','Uninstall'),@('Check','
     [IO.File]::WriteAllText((Join-Path $installer ($pair[0]+'.cmd')),$cmd,[Text.Encoding]::ASCII)
 }
 Copy-Item -LiteralPath (Join-Path $root 'LICENSE.txt') -Destination $installer -Force
-$zip=Join-Path $dist 'Trading212-Addon-Installer-0.1.0-PP0.89.0-Windows64.zip'
+$zip=Join-Path $dist 'Trading212-Addon-Installer-0.1.1-PP0.89.0-0.90.0-Windows64.zip'
 Compress-Archive -Path $installer -DestinationPath $zip -Force
 $zipHash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText(($zip+'.sha256'),($zipHash+'  '+[IO.Path]::GetFileName($zip)+"`n"),[Text.Encoding]::ASCII)

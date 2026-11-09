@@ -5,15 +5,29 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
+import org.osgi.framework.FrameworkUtil;
 
 /** Contributes only to the runtime application model, never to an original JAR/XMI. */
 public final class MenuProcessor
 {
     public static final String ID = "org.trading212.ppaddon.import";
 
+    static boolean supportsHost(String version)
+    {
+        return "0.89.0".equals(version) || "0.90.0".equals(version);
+    }
+
+    static boolean isSupportedHost()
+    {
+        return supportsHost(FrameworkUtil.getBundle(MenuProcessor.class).getVersion().toString());
+    }
+
     @Execute
     public void install(MApplication application)
     {
+        if (!isSupportedHost())
+            return;
+
         // Avoid duplicate contributions when the processor runs again or when
         // Eclipse reloads a model that already contains this add-on's entries.
         for (var window : application.getChildren())

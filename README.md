@@ -2,13 +2,13 @@
 
 An independent, experimental add-on that adds **File → Import → Trading 212 (CSV - add-on)** to the official Portfolio Performance application. Maintained by **jcor1965**. This project is not affiliated with or endorsed by Trading 212 or Portfolio Performance.
 
-**Supported host: official Portfolio Performance 0.89.0, Windows x86_64, Java 21.** Other host versions are deliberately refused by the installer. This is a prerelease, not a stable third-party extension API.
+**Supported hosts: official Portfolio Performance 0.89.0 and 0.90.0, Windows x86_64, Java 21.** Other host versions are deliberately refused by the installer. This is a prerelease, not a stable third-party extension API.
 
 ## Install and remove
 
 Extract the installer release ZIP, close Portfolio Performance and run `Install.cmd`. Select the official `PortfolioPerformance.exe`. Open the program using your usual shortcut and open a wallet to enable the menu.
 
-To remove the add-on, close the program and run `Uninstall.cmd`. `Check.cmd` reports registration and compatibility. See [Portuguese installation instructions](installer/LEIA-ME.txt).
+If add-on v0.1.0 is already installed, close the program and run `Uninstall.cmd` from the v0.1.1 package first. Then run `Install.cmd` and select the same executable. To remove the add-on, close the program and run `Uninstall.cmd`. `Check.cmd` reports registration and compatibility. See [Portuguese installation instructions](installer/LEIA-ME.txt).
 
 The installer adds its JAR under `addons/trading212` and changes only `configuration/config.ini` and `configuration/org.eclipse.equinox.simpleconfigurator/bundles.info` among the shipped application files. Executables and official libraries are not patched. It backs up configuration, archives derived Eclipse caches and removes only the add-on's three persisted UI nodes on uninstall, preserving the other workspace bytes. Wallets are not modified by installation or removal; importing and saving a wallet does modify that wallet.
 
@@ -21,13 +21,12 @@ The installer adds its JAR under `addons/trading212` and changes only `configura
 - Broker IDs and `Ticker|yyyyMMddTHHmmssZ` keys for dividends without IDs are stored in the existing Note field. No wallet schema extensions.
 - Additional nonzero charges and cross-currency conversion are rejected for review. Unsupported actions are reported, not silently ignored.
 - Existing transactions are checked by Portfolio Performance's generic potential-duplicate detector and excluded by default. Warnings can be overridden manually. This is not a persistent broker-ID index: distinct same-day transactions with equal economic fields can be flagged. There is additional within-batch ID/conflict checking.
-- The reused review window still has the generic PDF import title, while its content identifies Trading 212 CSV.
 
 Use a **copy of your wallet** for initial testing. Choose the intended cash and securities accounts explicitly.
 
 ## Build and test
 
-Requirements: Windows, JDK 21, an extracted official Portfolio Performance 0.89.0 distribution; Python 3 for installer regression tests. The application and JDK are not redistributed.
+Requirements: Windows, JDK 21, extracted official Portfolio Performance distributions (0.89.0 for compilation, both versions for validation); Python 3 for installer regression tests. The application and JDK are not redistributed.
 
 ```powershell
 ./scripts/Build.ps1 -PortfolioPath 'C:\path\portfolio' -JavaHome 'C:\path\jdk-21'
@@ -35,7 +34,7 @@ Requirements: Windows, JDK 21, an extracted official Portfolio Performance 0.89.
 python tests/test_installer.py --portfolio 'C:\path\portfolio' --java-home 'C:\path\jdk-21'
 ```
 
-Build output is written to `dist/`. Tests use isolated copies/configuration under `.build/`; they never install into the supplied original application directory. Only synthetic fixtures are tracked. GitHub Actions runs the synthetic tests and installer regressions; local evidence is recorded in [validation](docs/VALIDATION.md).
+Build output is written to `dist/`. Tests use isolated copies/configuration under `.build/`; they never install into the supplied original application directory. Only synthetic fixtures are tracked. GitHub Actions builds one package against 0.89.0 and runs the synthetic tests and installer regressions with both hosts; local evidence is recorded in [validation](docs/VALIDATION.md).
 
 ## Reporting issues
 

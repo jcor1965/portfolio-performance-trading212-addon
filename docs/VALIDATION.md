@@ -1,3 +1,9 @@
+# Validation of 0.1.1
+
+Build one installer against the official 0.89.0 Windows x86_64 distribution with JDK 21. Verify both official host archives against their published SHA-256 hashes. Run the synthetic import and installer suites with the same package on each host.
+
+The synthetic overlap test saves and reloads a wallet, then imports a CSV containing seven existing movements and one new deposit. The checks also cover the differences between the 0.89.0 and 0.90.0 duplicate detectors for manually entered dividends and interest. Host update behavior is simulated.
+
 # Validation of 0.1.0
 
 Local tests used official Portfolio Performance 0.89.0 on Windows x86_64 and JDK 21. The official application distribution was verified against its release SHA-256. Executables and official libraries were unchanged by the installer.

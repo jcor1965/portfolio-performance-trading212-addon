@@ -1,12 +1,13 @@
-TRADING 212 ADD-ON INSTALLER 0.1.0
-For OFFICIAL Portfolio Performance 0.89.0, Windows 64-bit.
+TRADING 212 ADD-ON INSTALLER 0.1.1
+For OFFICIAL Portfolio Performance 0.89.0 or 0.90.0, Windows 64-bit.
 Local CMD/PowerShell installer; this is not a signed EXE installer.
 
 INSTALL
 1. Extract the ENTIRE ZIP into a folder you own. Do not run it inside the ZIP.
-2. Close Portfolio Performance.
+2. Close Portfolio Performance. If add-on v0.1.0 is already installed, run
+   Uninstall.cmd from this package and select the same executable first.
 3. Open Install.cmd and select PortfolioPerformance.exe from the official
-   0.89.0 installation you normally use.
+   0.89.0 or 0.90.0 installation you normally use.
 4. After the success message, open PP using your USUAL shortcut.
 5. Open a wallet. Use File > Import > Trading 212 (CSV - add-on).
    The menu is disabled while no wallet is open.
@@ -14,8 +15,8 @@ INSTALL
    and securities accounts in the wizard before completing the import.
 
 You do not need Abrir-Addon.cmd or the separate launcher from the earlier proof.
-This package installs the SAME 0.1.0 importer; it does not add support for FX
-or additional charges that are still rejected. It retains the official wizard's
+The importer still rejects FX and unsupported additional charges. It retains
+the official wizard's
 duplicate checks, which produce warnings that can be accepted manually.
 
 WHAT IS CHANGED
@@ -49,12 +50,11 @@ Recommendation: uninstall the add-on BEFORE updating PP.
 This add-on does not participate in PP's p2 update mechanism.
 An update may regenerate bundles.info and remove the registration, causing
 the menu to disappear. The installer does not guarantee the add-on will survive
-updates. A new version requires new validation: this package refuses installation
-on 0.89.1 or any other version. Do not force compatibility in the manifest.
+updates. The installer allows only 0.89.0 and 0.90.0.
 If you have already updated, close PP and use Check.cmd. Uninstall.cmd
 is designed to clean up the old registration without overwriting the new
-version's configuration with an old backup. Then wait for a package validated
-for that version. Do not fix this by copying old configuration files over new ones.
+version's configuration with an old backup. If the new version is supported,
+run Install.cmd again. Keep the new version's configuration.
 
 PERMISSIONS AND ERRORS
 You need write permission in the selected folder. The installer does not

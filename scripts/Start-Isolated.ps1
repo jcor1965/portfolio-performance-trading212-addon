@@ -6,10 +6,12 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $official = (Resolve-Path -LiteralPath $PortfolioPath).Path.TrimEnd('\')
-$hostJar = Join-Path $official 'plugins/name.abuchen.portfolio.ui_0.89.0.jar'
-if (-not (Test-Path -LiteralPath $hostJar)) { throw 'This proof of concept requires the official 0.89.0 distribution. No files were changed.' }
+$hosts = @(Get-ChildItem -LiteralPath (Join-Path $official 'plugins') -Filter 'name.abuchen.portfolio.ui_*.jar')
+if ($hosts.Count -ne 1 -or $hosts[0].Name -notin @('name.abuchen.portfolio.ui_0.89.0.jar', 'name.abuchen.portfolio.ui_0.90.0.jar')) {
+    throw 'Official Portfolio Performance 0.89.0 or 0.90.0 required.'
+}
 if ($official.Contains(',')) { throw 'For this proof of concept, select a folder without commas in its path.' }
-$addon = Join-Path $PSScriptRoot 'org.trading212.ppaddon_0.1.0.jar'
+$addon = Join-Path $PSScriptRoot 'org.trading212.ppaddon_0.1.1.jar'
 if (-not (Test-Path -LiteralPath $addon)) { throw 'The add-on JAR is missing.' }
 $stateRoot = Join-Path $PSScriptRoot 'state'
 $configRoot = Join-Path $stateRoot 'configuration'
@@ -25,7 +27,7 @@ $resolvedLines = foreach ($line in $bundleLines) {
     $fields[2] = FileUri (Join-Path $official $fields[2])
     $fields -join ','
 }
-$resolvedLines += 'org.trading212.ppaddon,0.1.0,' + (FileUri $addon) + ',4,false'
+$resolvedLines += 'org.trading212.ppaddon,0.1.1,' + (FileUri $addon) + ',4,false'
 $utf8 = [Text.UTF8Encoding]::new($false)
 $bundleInfo = Join-Path $simpleRoot 'bundles.info'
 [IO.File]::WriteAllLines($bundleInfo, $resolvedLines, $utf8)

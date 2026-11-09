@@ -7,7 +7,9 @@ param(
 $ErrorActionPreference='Stop'
 $utf8=[Text.UTF8Encoding]::new($false)
 $symbol='org.trading212.ppaddon'
-$jarName='org.trading212.ppaddon_0.1.0.jar'
+$addonVersion='0.1.1'
+$supportedHosts=@('0.89.0','0.90.0')
+$jarName="${symbol}_$addonVersion.jar"
 $marker="`r`n# BEGIN Trading212 independent add-on`r`nosgi.checkConfiguration=true`r`n# END Trading212 independent add-on`r`n"
 # Verify package and backup integrity without depending on optional PowerShell modules.
 function Hash([string]$p) {
@@ -102,12 +104,24 @@ try {
     $state=if(Test-Path -LiteralPath $statePath) { Get-Content -Raw -LiteralPath $statePath|ConvertFrom-Json } else { $null }
     $version=GetVersion
     if($state -and $state.Root -ne $root) { throw 'The installation record belongs to another folder; no changes were made.' }
-    $line='org.trading212.ppaddon,0.1.0,addons/trading212/'+$jarName+',4,false'
+    # The v0.1.0 installer did not store the add-on version in its journal.
+    $installedVersion=if($state -and $state.Phase -ne 'uninstalled') {
+        if($state.AddonVersion) { $state.AddonVersion } else { '0.1.0' }
+    }
+    if($installedVersion -and $installedVersion -notin @('0.1.0',$addonVersion)) {
+        throw "Use the installer package for add-on $installedVersion to manage this installation."
+    }
+    $installedJarName=if($installedVersion) { "${symbol}_$installedVersion.jar" } else { $jarName }
+    $installedJar=Join-Path $own $installedJarName
+    $line="$symbol,$addonVersion,addons/trading212/$jarName,4,false"
     if($Mode -eq 'Status') {
-        $registered=@([IO.File]::ReadAllLines($bundles)|Where-Object { $_ -eq $line }).Count -eq 1
-        $jarOK=(Test-Path -LiteralPath $targetJar) -and $state -and ((Hash $targetJar) -eq $state.JarHash)
-        $compatible=$version -eq '0.89.0'
-        $message="Portfolio Performance: $version`r`nCompatible: $compatible`r`nRegistered: $registered`r`nJAR verified: $jarOK"
+        $installedLine="$symbol,$installedVersion,addons/trading212/$installedJarName,4,false"
+        $registered=($null -ne $installedVersion) -and (@([IO.File]::ReadAllLines($bundles)|Where-Object { $_ -eq $installedLine }).Count -eq 1)
+        $jarOK=($null -ne $installedVersion) -and (Test-Path -LiteralPath $installedJar) -and ((Hash $installedJar) -eq $state.JarHash)
+        $compatible=$version -in $supportedHosts
+        if($installedVersion -eq '0.1.0') { $compatible=$version -eq '0.89.0' }
+        $shownVersion=if($installedVersion) { $installedVersion } else { "$addonVersion (package)" }
+        $message="Portfolio Performance: $version`r`nAdd-on: $shownVersion`r`nCompatible: $compatible`r`nRegistered: $registered`r`nJAR verified: $jarOK"
         Write-Output $message
         if(-not $Quiet) { Add-Type -AssemblyName System.Windows.Forms; [Windows.Forms.MessageBox]::Show($message,'Add-on status')|Out-Null }
         exit 0
@@ -116,7 +130,8 @@ try {
     if($running.Count) { throw 'Close Portfolio Performance running from this folder before continuing.' }
     # Refuse unvalidated hosts and conflicting installations before changing files.
     if($Mode -eq 'Install') {
-        if($version -ne '0.89.0') { throw "Version $version has not been validated. This installer supports only 0.89.0. No changes were made." }
+        if($version -notin $supportedHosts) { throw "Version $version has not been validated. Supported versions: $($supportedHosts -join ', '). No changes were made." }
+        if($installedVersion -eq '0.1.0') { throw 'Add-on 0.1.0 is already installed. Run Uninstall.cmd from this package, then run Install.cmd again.' }
         $packageJar=Join-Path $PSScriptRoot $jarName
         if(-not(Test-Path -LiteralPath $packageJar)) { throw 'The add-on JAR is missing from the package.' }
         $expected=(Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot 'addon.sha256')).Trim()
@@ -138,7 +153,7 @@ try {
         $beforeBundles=ReadText $bundles; $beforeConfig=ReadText $config
         $afterBundles=$beforeBundles+"`r`n"+$line+"`r`n"
         $afterConfig=$beforeConfig+$marker
-        $state=[ordered]@{Root=$root;Version=$version;Backup=$backupName;Phase='prepared';JarHash=$expected;BundlesHash='';ConfigHash='';BundlesBeforeHash=(Hash $bundles);ConfigBeforeHash=(Hash $config)}
+        $state=[ordered]@{Root=$root;Version=$version;AddonVersion=$addonVersion;Backup=$backupName;Phase='prepared';JarHash=$expected;BundlesHash='';ConfigHash='';BundlesBeforeHash=(Hash $bundles);ConfigBeforeHash=(Hash $config)}
         SaveState $state
         try {
             Copy-Item -LiteralPath $packageJar -Destination $targetJar
@@ -179,8 +194,8 @@ try {
             $current=ReadText $config
             WriteAtomic $config ($utf8.GetBytes($current.Replace($marker,'')))
         }
-        if(Test-Path -LiteralPath $targetJar) {
-            if((Hash $targetJar) -eq $state.JarHash) { Remove-Item -LiteralPath $targetJar }
+        if(Test-Path -LiteralPath $installedJar) {
+            if((Hash $installedJar) -eq $state.JarHash) { Remove-Item -LiteralPath $installedJar }
             else { Write-Warning 'The JAR has changed: it was preserved but removed from the loading configuration.' }
         }
         $state.Phase='uninstalled'; SaveState $state
